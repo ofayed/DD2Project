@@ -5,22 +5,25 @@
 using namespace std;
 
 
-void netlist(string filename)
+void netl(string filename)
 {
 	ifstream netlist;
 	int cells, connections, rows, columns;
 	netlist.open(filename);
+	
 	netlist >> cells;
 	netlist >> connections;
 	netlist >> rows;
 	netlist >> columns;
-	cout << cells << "/t" << connections << "/t" << rows << "/t" << columns;
-
+	cout << cells << "\t" << connections << "\t" << rows << "\t" << columns;
+	netlist.close();
 }
 
 int main()
 {
-	netlist("test.txt");
+	netl("test.txt");
 	return 0;
 }
+
+
 
