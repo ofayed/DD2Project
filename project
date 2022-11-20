@@ -1,0 +1,26 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+
+void netlist(string filename)
+{
+	ifstream netlist;
+	int cells, connections, rows, columns;
+	netlist.open(filename);
+	netlist >> cells;
+	netlist >> connections;
+	netlist >> rows;
+	netlist >> columns;
+	cout << cells << "/t" << connections << "/t" << rows << "/t" << columns;
+
+}
+
+int main()
+{
+	netlist("test.txt");
+	return 0;
+}
+
