@@ -1,21 +1,41 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+#include <map>
+#include<vector>
+#include <sstream>
 using namespace std;
 
 
 void netl(string filename)
 {
 	ifstream netlist;
+	map<int, vector<int>> cellList;
 	int cells, connections, rows, columns;
 	netlist.open(filename);
-	
+
 	netlist >> cells;
 	netlist >> connections;
 	netlist >> rows;
 	netlist >> columns;
-	cout << cells << "\t" << connections << "\t" << rows << "\t" << columns;
+	cout << cells << "\t" << connections << "\t" << rows << "\t" << columns<<"\n";
+	int numberofcon;
+	vector<int> netconc;
+	for (int i = 0; i < connections; i++)
+	{
+		
+		//getline(netList,test);
+		netlist >> numberofcon;
+		//cout << "\n" << numberofcon;
+		netconc.resize(numberofcon);
+		for (int j = 0; j < numberofcon; j++)
+		{
+			netlist >> netconc[j];
+		}
+		cellList.insert(pair<int, vector<int>>(numberofcon, netconc));
+	}
+
+	
 	netlist.close();
 }
 
@@ -24,6 +44,8 @@ int main()
 	netl("test.txt");
 	return 0;
 }
+
+
 
 
 
