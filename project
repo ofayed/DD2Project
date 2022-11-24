@@ -59,12 +59,12 @@ int maxhpwl(vector<vector<int>> cellList, int nets, vector<vector<int>>  xyval,i
 			if (xyval[cellList[i][k]][2] > maxy) maxy = xyval[cellList[i][k]][2];
 			if (xyval[cellList[i][k]][2] < miny) miny = xyval[cellList[i][k]][2];
 			currhpwl = hpwl(minx, maxx, miny, maxy);
-			cout << "\n" << "current hpwl" << currhpwl;
+			//cout << "\n" << "current hpwl" << currhpwl;
 		}
 		if (oldhpwl < currhpwl) oldhpwl = currhpwl;
-
+		sum = sum + currhpwl;
 	}
-	sum = sum + currhpwl;
+	
 
 	return sum;
 }
@@ -234,7 +234,7 @@ int main()
 			}
 		}
 		currtemp = currtemp * 0.95;
-		cout << "Currtemp " << currtemp << "    ftemp" << ftemp << "\n \n \n";
+		//cout << "Currtemp " << currtemp << "    ftemp" << ftemp << "\n \n \n";
 	}
 
 	print(sqgrid, bestcost, rows, columns);
