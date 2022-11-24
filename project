@@ -4,48 +4,242 @@
 #include <map>
 #include<vector>
 #include <sstream>
+#include <math.h>
 using namespace std;
 
 
-void netl(string filename)
+
+void swap(int x1,int y1, vector<vector<int>> &sqgrid,int x2, int y2)
 {
+	int valtmp;
+	
+	valtmp = sqgrid[x1][y1];
+	x1 = x2;
+	y1 = y2;
+	sqgrid[x1][y1] = sqgrid[x2][y2];
+	
+	sqgrid[x2][y2] = valtmp;
+}
+void print(vector<vector<int>> sqgrid, int hpwl, int x , int y)
+{
+	cout << "Total wire length = " << hpwl<<"\n";
+	for (int i = 0; i < x; i++)
+	{
+		for (int k = 0; k < y; k++)
+		{
+			if (sqgrid[i][k] == -1) cout << "--";
+			else if (sqgrid[i][k] < 10 && sqgrid[i][k] > -1) cout << "0" << sqgrid[i][k];
+			else cout << sqgrid[i][k];
+			cout << "\t";
+		}
+		cout << "\n";
+	}
+
+	
+
+
+}
+int hpwl(int xmin, int xmax, int ymin, int ymax)
+{
+	return ((xmax - xmin) + (ymax - ymin));
+}
+
+int maxhpwl(vector<vector<int>> cellList, int nets, vector<vector<int>>  xyval,int columns, int rows)
+{
+	int maxy = 0, miny = columns, maxx = 0, minx = rows, currhpwl = 0, oldhpwl = 0, sum = 0;
+	for (int i = 0; i < nets; i++)
+	{
+		//cout << "\n \n" << i;
+		for (int k = 1; k < cellList[i][0]; k++)
+		{
+			//cout << "\n" << "celllist" << cellList[i][0];
+			//cout << xyval[cellList[i][k]][1] << "\n"<< xyval[cellList[i][k]][2];
+			if (xyval[cellList[i][k]][1] > maxx) maxx = xyval[cellList[i][k]][1];
+			if (xyval[cellList[i][k]][1] < minx) minx = xyval[cellList[i][k]][1];
+			if (xyval[cellList[i][k]][2] > maxy) maxy = xyval[cellList[i][k]][2];
+			if (xyval[cellList[i][k]][2] < miny) miny = xyval[cellList[i][k]][2];
+			currhpwl = hpwl(minx, maxx, miny, maxy);
+			cout << "\n" << "current hpwl" << currhpwl;
+		}
+		if (oldhpwl < currhpwl) oldhpwl = currhpwl;
+
+	}
+	sum = sum + currhpwl;
+
+	return sum;
+}
+
+
+int main()
+{
+	
 	ifstream netlist;
-	map<int, vector<int>> cellList;
+	vector<vector<int>> cellList;
+	vector<vector<int>> sqgrid;
+
 	int cells, connections, rows, columns;
-	netlist.open(filename);
+	netlist.open("test.txt");
 
 	netlist >> cells;
 	netlist >> connections;
 	netlist >> rows;
 	netlist >> columns;
-	cout << cells << "\t" << connections << "\t" << rows << "\t" << columns<<"\n";
+	cout << cells << "\t" << connections << "\t" << rows << "\t" << columns << "\n";
 	int numberofcon;
-	vector<int> netconc;
+	
+	cellList.resize(connections);
+	for (int i = 0; i < connections; i++)
+		cellList[i].resize(cells+1);
+
+	//cout << "\n" << cellList.size();
 	for (int i = 0; i < connections; i++)
 	{
-		
+
 		//getline(netList,test);
 		netlist >> numberofcon;
+		
+
 		//cout << "\n" << numberofcon;
-		netconc.resize(numberofcon);
-		for (int j = 0; j < numberofcon; j++)
+		
+
+		//cout << "\n" << cellList[i].size();
+		for (int j = 1; j < numberofcon+1; j++)
 		{
-			netlist >> netconc[j];
+			cellList[i][0]= numberofcon;
+			netlist >> cellList[i][j];
 		}
-		cellList.insert(pair<int, vector<int>>(numberofcon, netconc));
+
+	}
+	
+
+
+	netlist.close();
+	for (int i = 0; i < connections; i++)
+	{
+		for (int j = 0; j < cells; j++)
+		{
+			if(cellList[i][j] == 0)
+			{ }
+			else {
+				cout << cellList[i][j] << "\t";
+			}
+
+
+		}
+		cout << "\n";
+	}
+	//cout << "\n"<<cellList[0][0] << cellList[1][0] << cellList[2][0];
+
+
+	int xmin = rows, ymin = columns;
+	int xmax = 0, ymax = 0;
+	bool rejected = false;
+	/*for (int i = 0; i < x; i++) {
+
+		// Declare a memory block
+		// of size n
+		sqgrid[i] = new int[y];
+	}*/
+
+	//Declaring a 2D-vector of size: x * y
+	sqgrid.resize(rows);
+
+	for (int i = 0; i < rows; i++)
+		sqgrid[i].resize(columns);
+
+	//Filling the 2D-vector with empty cells
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < columns; j++)
+		{
+			sqgrid[i][j] = -1;
+		}
+	}
+	vector<vector<int>> valxy;
+	valxy.resize(cells);
+	for (int i = 0; i < cells; i++)
+		valxy[i].resize(3);
+	//Initial Placement
+	srand((unsigned)time(0));
+	for (int i = 0; i < cells+1 ; i++)
+	{
+		if (rejected)
+			i--;
+
+		int rn1 = (rand() % rows);
+		int rn2 = (rand() % columns);
+
+		if (sqgrid[rn1][rn2] == -1)
+		{
+			sqgrid[rn1][rn2] = i;
+			valxy[i][0] = i;
+			valxy[i][1] = rn1;
+			valxy[i][2] = rn2;
+		
+
+			rejected = false;
+		}
+		else
+			rejected = true;
+	}
+	print(sqgrid, 25, rows, columns);
+	double cost, bestcost, oldcost, gain;
+	double initialtemp, currtemp, ftemp, moveptemp;
+
+
+
+	//int xmin = rows, ymin = columns;
+	/*int xmax = 0, ymax = 0;
+	bool rejected = false;*/
+	/*for (int i = 0; i < x; i++) {
+
+		// Declare a memory block
+		// of size n
+		sqgrid[i] = new int[y];
+	}*/
+
+	//Declaring a 2D-vector of size: x * y
+
+
+	cost = maxhpwl(cellList, connections, valxy, columns, rows);
+	//Initial Placement
+	initialtemp = 500 * cost;
+	currtemp = initialtemp;
+	bestcost = cost;
+	ftemp = 0.000005 * (cost / connections);
+	while (currtemp > ftemp)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			oldcost = cost;
+			srand((unsigned)time(0));
+
+			int rn1 = (rand() % rows);
+			int rn2 = (rand() % columns);
+			int rn3 = (rand() % rows);
+			int rn4 = (rand() % columns);
+	
+			swap(rn1, rn2, sqgrid, rn3, rn4);
+			
+			cost = maxhpwl(cellList, connections, valxy, columns, rows);
+			//cost = hpwl(xmin, xmax, ymin, ymax);
+			gain = cost - oldcost;
+			if (gain < 0)
+			{
+				srand((unsigned)time(0));
+
+				float prob = (rand() % 1);
+				if (prob >= exp(gain / currtemp)) swap(rn1, rn2, sqgrid, rn3, rn4);
+				else if (cost < bestcost) bestcost = cost;
+			}
+		}
+		currtemp = currtemp * 0.95;
+		cout << "Currtemp " << currtemp << "    ftemp" << ftemp << "\n \n \n";
 	}
 
+	print(sqgrid, bestcost, rows, columns);
 	
-	netlist.close();
-}
 
-int main()
-{
-	netl("test.txt");
 	return 0;
 }
-
-
-
-
 
